@@ -1,0 +1,7 @@
+# Copy to .dev.vars for `pnpm --filter @app/bot dev` (wrangler reads it as the
+# Worker's secrets). None is required: with no token the Worker serves its
+# pages and /health says to connect one.
+TELEGRAM_TOKEN=
+ADMIN_ID=
+ADMIN_PASSWORD=
+TELEGRAM_SECRET_TOKEN=

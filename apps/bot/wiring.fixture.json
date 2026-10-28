@@ -1,0 +1,14 @@
+{
+  "cloudflare-kv/dev": {
+    "app_kv_id": "00000000000000000000000000000002",
+    "app_kv_title": "dev-telegram-ai-bot-app-kv-dev"
+  },
+  "cloudflare-kv/stage": {
+    "app_kv_id": "00000000000000000000000000000001",
+    "app_kv_title": "stg-telegram-ai-bot-app-kv-stage"
+  },
+  "cloudflare-kv/prod": {
+    "app_kv_id": "00000000000000000000000000000003",
+    "app_kv_title": "prod-telegram-ai-bot-app-kv-prod"
+  }
+}

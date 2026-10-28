@@ -1,0 +1,32 @@
+{
+  "name": "@app/bot-tests",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "lint": "eslint src"
+  },
+  "devDependencies": {
+    "@app/bot": "workspace:*",
+    "@app/eslint-config": "workspace:*",
+    "@app/tsconfig": "workspace:*",
+    "@app/vitest-config": "workspace:*",
+    "@bot/agent": "workspace:*",
+    "@bot/ai": "workspace:*",
+    "@bot/config": "workspace:*",
+    "@bot/core": "workspace:*",
+    "@bot/i18n": "workspace:*",
+    "@bot/plugins": "workspace:*",
+    "@bot/telegram": "workspace:*",
+    "@bot/types": "workspace:*",
+    "@bot/web": "workspace:*",
+    "@cloudflare/workers-types": "^5.20261006.1",
+    "@types/node": "^22.9.0",
+    "eslint": "^9.27.0",
+    "typescript": "^5.8.3",
+    "vitest": "^4.1.11"
+  }
+}

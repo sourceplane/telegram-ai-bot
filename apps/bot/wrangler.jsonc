@@ -1,0 +1,27 @@
+// GENERATED from wrangler.template.jsonc by tooling/wire — edit the
+// template, not this file. The committed copy is the fixture render
+// (`pnpm run wire:fixture`); every Orun lane renders its own environment.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "telegram-ai-bot-bot",
+  "main": "src/index.ts",
+  // Upstream's date: nodejs_compat is on by default from it.
+  "compatibility_date": "2026-08-04",
+  "observability": { "enabled": true },
+  "vars": { "ENVIRONMENT": "local" },
+  // Workers AI — the default model's binding (no key).
+  "ai": { "binding": "AI" },
+  // Upstream's KV namespace: the global configuration and every chat's state.
+  "kv_namespaces": [
+    { "binding": "DATABASE", "id": "00000000000000000000000000000001" }
+  ],
+  "env": {
+    "stage": {
+      "vars": { "ENVIRONMENT": "stage" },
+      "ai": { "binding": "AI" },
+      "kv_namespaces": [
+        { "binding": "DATABASE", "id": "00000000000000000000000000000001" }
+      ]
+    }
+  }
+}

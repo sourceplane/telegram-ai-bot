@@ -1,0 +1,40 @@
+apiVersion: sourceplane.io/v1
+kind: Component
+metadata:
+  name: bot-tests
+  description: The bot's tests (every upstream library's own, and the port's, in workerd), run on every pull request
+spec:
+  type: turbo-package
+  lifecycle: production
+  owner: platform
+  # Its pages, attached to it in the workspace's catalog: what the Docs
+  # library shows for it, and what the catalog's docs and runbook checks read.
+  # Generated from what this manifest and its sources declare.
+  docs:
+    overview: docs/overview.md
+    pages:
+      - { path: docs/architecture.md, role: architecture, title: Architecture }
+      - { path: docs/runbook.md, role: runbook, title: Runbook }
+  domain: tests
+  # What these tests test lives outside this directory: the libraries and the
+  # Worker. A change to either re-plans this component, so a pull request that
+  # changes the bot runs its tests.
+  change:
+    inputs:
+      - packages/**
+      - apps/bot/**
+  subscribe:
+    environments:
+      - name: dev
+        profile: quick-check
+  parameters:
+    nodeVersion: "22"
+    pnpmVersion: "10.12.1"
+    buildCommand: pnpm exec turbo run build --filter=./
+    typecheckCommand: pnpm exec turbo run typecheck --filter=./
+    # `...`: this package and everything it depends on — every library's own
+    # tests run beside the port's.
+    preBuildCommand: pnpm exec turbo run test --filter=@app/bot-tests...
+  labels:
+    team: platform
+    layer: test

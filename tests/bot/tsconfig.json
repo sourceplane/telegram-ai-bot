@@ -1,0 +1,14 @@
+{
+  "extends": "../../tooling/tsconfig/worker.json",
+  "compilerOptions": {
+    "composite": false,
+    "declaration": false,
+    "declarationMap": false,
+    "noEmit": true,
+    "types": ["@cloudflare/workers-types", "node"],
+    "paths": {
+      "@/*": ["../../apps/bot/src/*"]
+    }
+  },
+  "include": ["src/**/*.ts"]
+}

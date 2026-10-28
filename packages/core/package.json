@@ -1,0 +1,34 @@
+{
+    "name": "@bot/core",
+    "version": "0.0.0",
+    "private": true,
+    "type": "module",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "imports": {
+        "#/*": "./src/*"
+    },
+    "scripts": {
+        "build": "tsc -b",
+        "test": "vitest run",
+        "typecheck": "tsc -b",
+        "lint": "oxlint src"
+    },
+    "dependencies": {
+        "@bot/agent": "workspace:*",
+        "@bot/config": "workspace:*",
+        "@bot/i18n": "workspace:*",
+        "@bot/plugins": "workspace:*",
+        "@bot/telegram": "workspace:*",
+        "@bot/web": "workspace:*",
+        "telegram-bot-api-types": "^10.2.0"
+    },
+    "devDependencies": {
+        "vitest": "^4.1.11",
+        "@app/tsconfig": "workspace:*",
+        "@types/node": "^26.5.1",
+        "typescript": "^5.8.3",
+        "@app/vitest-config": "workspace:*",
+        "oxlint": "^1.83.0"
+    }
+}
