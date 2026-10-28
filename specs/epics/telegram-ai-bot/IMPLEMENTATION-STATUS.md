@@ -5,8 +5,31 @@
 | TB0 — the spec | ✅ | TB-1 (#1) |
 | TB1 — the bot on Workers | ✅ | TB-2 (#2) |
 | TB2 — the KV namespace from Terraform | ✅ | TB-3 (#3) |
-| TB3 — ready to instantiate | ✅ | TB-4 |
-| TB4 — a baseline | planned | TB-5 |
+| TB3 — ready to instantiate | ✅ | TB-4 (#4) |
+| TB4 — a baseline | ✅ | TB-5 — `baseline-v1` once cut |
+
+## TB4 — what the baseline adds
+
+- `blueprint.yaml` (the console card: one Cloudflare provider and one
+  brokered token, the bot token connected after the build, the subdomain from
+  the connection, no domain asked) and `repo-blueprint.yaml` (one landing,
+  `01-product`, then the record, `02-docs`), on the turso v8 / orun v2.88.0
+  shape: one `secrets` reconcile, the task set-up in the background, landings
+  checked in the box, the watch every 5 s.
+- The identity (`.baseline/identity.json`) and the rename seam `BOT_NAME`;
+  the bootstrap tooling; the deployment record probing `/health`; the
+  product's README and its operating contract.
+- The baseline's tests: the contract tiers, generated component docs, the
+  leak gate (upstream's licence and the deploy's scripts must ship),
+  placement (the KV root, every secret ref, the optional bot secrets, the
+  token kept out of the build, the smoke's webhook binding), and the e2e —
+  the stage lane in a staged job tree, the Worker served with no token, then
+  with one: bound to a stand-in Telegram API (`testing/lib/telegram-api.py`)
+  and answering an update through a stand-in model API
+  (`testing/lib/model-api.py`), configured through the admin page's own RPC.
+
+Phase minutes: `01-product` 7 + `02-docs` 1 = 8, estimated; no bootstrap has
+been timed.
 
 ## Departures from the upstream
 
