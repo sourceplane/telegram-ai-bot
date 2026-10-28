@@ -5,19 +5,63 @@ TBXark's [ChatGPT-Telegram-Workers](https://github.com/TBXark/ChatGPT-Telegram-W
 you choose, streams its replies, draws images, runs custom commands and
 plugins, and is managed from a Telegram Mini-App — running as **one
 Cloudflare Worker**, its settings and every chat's history in a **Workers
-KV** namespace Terraform provisions per environment through
-[Orun](https://github.com/sourceplane/orun), and **Workers AI** the model it
-answers with before you have any vendor key, through the Worker's own `AI`
-binding.
+KV** namespace provisioned by Terraform through
+[Orun](https://github.com/sourceplane/orun), **Workers AI** the model it
+answers with before you have any vendor key, and packaged as an **Orun
+baseline**: one command takes a new bot from nothing to live on stage and
+prod, in its own repository, under its own name — in ONE landing.
 
 The upstream was written for Workers already, so its code is the code: its
 libraries are workspace packages here, built and tested as upstream builds
-and tests them. What the port adds is the deploy: the namespace from
+and tests them. What the port adds is the deploy — the namespace from
 Terraform, the bot token handed to the Worker as a secret, Telegram's
 webhook bound to the Worker after each deploy, a `/health` route the deploy
-smoke-tests, and Workers AI as the default. See
+smoke-tests, and Workers AI as the default — and what the baseline adds is
+everything needed to make a copy of it somebody else's, built the way
+[cirrus-baseline](https://github.com/sourceplane/cirrus-baseline) is since
+its one-landing bootstrap. See
 [`specs/epics/telegram-ai-bot`](specs/epics/telegram-ai-bot/README.md) for
 the design, the milestones and the as-built status.
+
+## Instantiating a product
+
+```bash
+git clone --depth 1 --branch <baseline-tag> https://github.com/sourceplane/telegram-ai-bot
+cd telegram-ai-bot
+orun new --blueprint repo-blueprint.yaml --out ~/bots/acme-bot --run-hooks --resume \
+  --set reponame=acme-bot --set productname="Acme Assistant" \
+  --set githuborg=acme-inc --set subdomain=<workers-dev-subdomain>
+```
+
+Or, once the platform's registry lists it, from the Orun console (Baselines →
+`telegram-ai-bot` → Build). Two phases: **`01-product`** creates the
+repository and lands the whole product as ONE pull request — intent, CI,
+tooling, the KV root, the bot's libraries, the Worker and its tests — and one
+convergence applies the KV namespace on stage and prod and then deploys the
+Worker bound to it, smoke-tested on `/health`; **`02-docs`** records the live
+deployment from probed facts. The bot token is not part of the build: the
+bot goes live answering on workers.dev, and its owner stores the token and
+redeploys (the product's README, "Connecting a bot"), which binds the
+webhook. **[BOOTSTRAP.md](BOOTSTRAP.md)** is the operator guide;
+[docs/phases/](docs/phases/README.md) has a page per phase.
+
+The new repository receives the **product only** — the Worker, upstream's
+libraries (with upstream's MIT licence), the KV root, the tests, the CI, the
+tooling, a README of its own and its operating contract — renamed
+throughout to the product's name, repository, Cloudflare Worker and
+namespace names. None of this repository's machinery ships.
+
+| What makes it a baseline | Where |
+|---|---|
+| The console card (inputs, secrets, programme) | `blueprint.yaml` |
+| The build document (modules, phases, hooks) | `repo-blueprint.yaml` |
+| This tree's identity, and the bootstrap's task contracts | `.baseline/` |
+| The rename engine | `tooling/rebrand/rebrand.mjs` |
+| The bootstrap's helpers (deferrals, redeploy marker, work-tree strip) | `tooling/bootstrap/` |
+| The deployment-record renderer | `hooks/render-deployment-docs.sh` |
+| The product's README and context pack | `.baseline/product/README.md`, `ai/context/` |
+| The baseline's tests: contract, wiring, leak, offline bootstrap, end to end | `testing/`, `.github/workflows/baseline.yml` |
+| Cutting a `baseline-vN` tag | `.github/workflows/tag.yml` |
 
 ## What is here
 
@@ -148,6 +192,14 @@ links use it. The repository names the
 domain in one place, `BASE_DOMAIN` in `intent.yaml`, which it was born with
 as the reserved placeholder `telegram-ai-bot.example.com`. Replace it with
 your domain in the same change that records it.
+
+## CI
+
+| Workflow | What it runs | Ships to a product |
+|---|---|---|
+| `ci.yml` | the Orun pipeline, and the only workflow a product carries: `orun plan --changed`, then one job per lane. A pull request runs the verify lanes (the libraries' and the Worker's tests, the Worker built and dry-deployed per environment, the KV root planned), except the bootstrap's own landings (`orun/BASE-*`), where `plan` alone is the check; a merge applies the KV namespace, then deploys the bot stage → prod. It plans nothing while `intent.yaml` names the placeholder workspace `ws_CHANGE_ME`, as this repository does. A manual run (Orunbase's Deploy button, or Run workflow on `main`) plans the environment and components it names under the push-to-main trigger, so they deploy as a merge deploys them | yes |
+| `baseline.yml` | the baseline's own tiers: contract tests, the component docs, the wiring path, the blueprint read by the pinned orun, the leak gate, the offline bootstrap with the product's own plan, the product built in the job tree, dry-deployed, served, bound to a stand-in Telegram API and answering an update | no |
+| `tag.yml` | cuts a `baseline-vN` tag (manual) | no |
 
 ## Credit and licence
 

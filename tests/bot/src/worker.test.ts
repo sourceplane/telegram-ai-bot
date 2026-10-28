@@ -32,7 +32,9 @@ describe('the Worker', () => {
       expect(r.status).toBe(200)
       expect(r.headers.get('content-type')).toContain('text/html')
       const page = await r.text()
-      expect(page).toContain(`<title>${BOT_NAME}</title>`)
+      // the name is HTML text in the page: escaped as the page escapes it
+      const escaped = BOT_NAME.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      expect(page).toContain(`<title>${escaped}</title>`)
       expect(page).not.toContain('<title>ChatGPT-Telegram-Workers</title>')
     }
   })
