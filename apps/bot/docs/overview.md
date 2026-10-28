@@ -13,7 +13,7 @@ A Cloudflare Worker, deployed per environment by its CI lane.
 
 ## Depends on
 
-- (none)
+- **cloudflare-kv** — Provisions the Cloudflare KV namespace the bot binds as DATABASE (stage and prod)
 
 ## Depended on by
 

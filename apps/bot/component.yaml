@@ -27,6 +27,20 @@ spec:
   change:
     inputs:
       - packages/**
+  # INFRA BEFORE APP. The Worker binds the KV namespace by id, and the id is
+  # rendered into its config during the build from the wiring document the
+  # cloudflare-kv root lease-publishes after its apply. A job resolves its
+  # secrets when it STARTS, so on a merge to main this deploy waits for the
+  # apply (enforced) — one convergence runs cloudflare-kv → bot per
+  # environment, and the document is there. A pull request deploys nothing,
+  # so nothing on one waits (advisory).
+  dependsOn:
+    - component: cloudflare-kv
+      mode: enforced
+      modeRules:
+        - mode: advisory
+          when:
+            triggerRef: github-pull-request
   # The KV namespace's wiring document, per environment: the cloudflare-kv
   # root lease-publishes it after its apply, and the build renders the
   # namespace id into wrangler.jsonc from it.
