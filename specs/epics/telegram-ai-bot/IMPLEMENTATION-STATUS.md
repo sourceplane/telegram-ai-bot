@@ -3,8 +3,8 @@
 | Milestone | State | Landed |
 |---|---|---|
 | TB0 — the spec | ✅ | TB-1 (#1) |
-| TB1 — the bot on Workers | ✅ | TB-2 |
-| TB2 — the KV namespace from Terraform | planned | TB-3 |
+| TB1 — the bot on Workers | ✅ | TB-2 (#2) |
+| TB2 — the KV namespace from Terraform | ✅ | TB-3 |
 | TB3 — ready to instantiate | planned | TB-4 |
 | TB4 — a baseline | planned | TB-5 |
 
@@ -29,3 +29,4 @@ Upstream: TBXark/ChatGPT-Telegram-Workers v1.10.7 at `0d152e5`.
 | Webhook binding | the owner opens `/init` and presses bind | also `POST /init/bind`, authenticated by the token, which the deploy's smoke calls | a deploy with a token comes up bound |
 | `/health` | — | added | the deploy's smoke and the bootstrap's probe |
 | `wrangler dev` | remote Workers AI by default | `dev` (with an account) and `dev:local` (`--local`, no account) | a local run without a Cloudflare login |
+| KV namespace | "Deploy to Cloudflare" creates it; CLI deploys fill its id in by hand | `infra/terraform/cloudflare-kv` per environment (`<prefix><repo>-app-kv-<env>`), adopting one of the same title; its id rendered into the Worker's config from the wiring document, the deploy waiting on the apply | provisioned and ordered by the product's own plan |

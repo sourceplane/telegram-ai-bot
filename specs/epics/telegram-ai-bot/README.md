@@ -13,7 +13,7 @@ the baseline makes a copy of it somebody else's in one landing.**
 
 | | |
 |---|---|
-| Status | In progress — TB0 and TB1 on main |
+| Status | In progress — TB0–TB2 on main |
 | Upstream | [TBXark/ChatGPT-Telegram-Workers](https://github.com/TBXark/ChatGPT-Telegram-Workers) (MIT), v1.10.7 at `0d152e5` (2026-09-15) |
 | Reference | [hono-api](https://github.com/sourceplane/hono-api) — a plain Worker on the `cloudflare-worker-turbo` composition and its bootstrap; [kv-redis-starter](https://github.com/sourceplane/kv-redis-starter) — a KV root and its wiring; [rag-chatbot](https://github.com/sourceplane/rag-chatbot) — Workers AI as the keyless default |
 | Key | `TB` |
