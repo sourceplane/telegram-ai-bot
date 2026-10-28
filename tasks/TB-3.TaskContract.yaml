@@ -1,0 +1,13 @@
+apiVersion: orun.io/v1
+kind: TaskContract
+metadata:
+  name: TB-3
+  title: "The KV namespace from Terraform"
+spec:
+  goal: The KV namespace the bot binds as DATABASE is provisioned per environment by Terraform, its id published as a wiring document the Worker's config renders from, and the deploy waits for it
+  affects:
+    - infra/terraform/cloudflare-kv
+    - apps/bot/component.yaml
+  doneWhen:
+    - the root validates and its wiring keys match the template's tokens
+  gates: []

@@ -1,0 +1,18 @@
+apiVersion: orun.io/v1
+kind: TaskContract
+metadata:
+  name: TB-1
+  title: "The spec"
+spec:
+  goal: The repository has its intent, CI, tooling and spec index, and the telegram-ai-bot epic — declaration, doc set and task contracts — is on main
+  affects:
+    - intent.yaml
+    - .github/workflows/ci.yml
+    - tooling
+    - specs
+    - tasks
+    - README.md
+  doneWhen:
+    - epic.yaml, README, design, implementation plan, risks and status are merged
+    - the five task contracts exist
+  gates: []

@@ -1,0 +1,15 @@
+apiVersion: orun.io/v1
+kind: TaskContract
+metadata:
+  name: TB-4
+  title: "Ready to instantiate"
+spec:
+  goal: A reader can run, test, connect a bot to and deploy telegram-ai-bot from its README, and the as-built status records every departure from the upstream
+  affects:
+    - README.md
+    - apps/bot/README.md
+    - specs/epics/telegram-ai-bot
+  doneWhen:
+    - the README says how to run, test, connect a bot and deploy, and maps every upstream piece
+    - IMPLEMENTATION-STATUS.md lists the departures
+  gates: []

@@ -1,0 +1,23 @@
+apiVersion: orun.io/v1
+kind: TaskContract
+metadata:
+  name: TB-5
+  title: "A baseline"
+spec:
+  goal: telegram-ai-bot becomes an Orun baseline that takes a new bot from nothing to live on stage and prod in one landing, then records it
+  affects:
+    - blueprint.yaml
+    - repo-blueprint.yaml
+    - BOOTSTRAP.md
+    - .baseline
+    - docs/phases
+    - hooks
+    - testing
+    - tooling/rebrand
+    - tooling/bootstrap
+    - ai/context
+    - .github/workflows/baseline.yml
+    - .github/workflows/tag.yml
+  doneWhen:
+    - Baseline CI is green — contract tests, generated component docs, the blueprint read by the pinned orun, the leak gate, placement and e2e
+  gates: []
