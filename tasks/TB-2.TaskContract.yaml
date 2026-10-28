@@ -1,0 +1,18 @@
+apiVersion: orun.io/v1
+kind: TaskContract
+metadata:
+  name: TB-2
+  title: "The bot on Workers"
+spec:
+  goal: ChatGPT-Telegram-Workers runs as one Cloudflare Worker built in this workspace — the upstream libraries in packages/, the Worker in apps/bot, Workers AI its default model, /health and the webhook binding added — with its tests
+  affects:
+    - apps/bot
+    - packages
+    - tests/bot
+    - pnpm-lock.yaml
+    - pnpm-workspace.yaml
+    - package.json
+  doneWhen:
+    - pnpm typecheck, lint, test and build are green, and the bundle is dependency-free ESM
+    - wrangler dev serves the home and admin pages and /health with no token, and with one answers an update posted to its webhook
+  gates: []
