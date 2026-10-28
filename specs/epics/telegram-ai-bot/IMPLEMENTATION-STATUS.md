@@ -4,8 +4,8 @@
 |---|---|---|
 | TB0 — the spec | ✅ | TB-1 (#1) |
 | TB1 — the bot on Workers | ✅ | TB-2 (#2) |
-| TB2 — the KV namespace from Terraform | ✅ | TB-3 |
-| TB3 — ready to instantiate | planned | TB-4 |
+| TB2 — the KV namespace from Terraform | ✅ | TB-3 (#3) |
+| TB3 — ready to instantiate | ✅ | TB-4 |
 | TB4 — a baseline | planned | TB-5 |
 
 ## Departures from the upstream
