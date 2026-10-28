@@ -1,0 +1,118 @@
+apiVersion: sourceplane.io/v1
+kind: Component
+metadata:
+  name: bot
+  description: The Telegram bot (upstream's Workers entry over its libraries, one plain Cloudflare Worker per environment)
+spec:
+  type: cloudflare-worker-turbo
+  lifecycle: production
+  owner: platform
+  # Its pages, attached to it in the workspace's catalog: what the Docs
+  # library shows for it, and what the catalog's docs and runbook checks read.
+  # Generated from what this manifest and its sources declare.
+  docs:
+    overview: docs/overview.md
+    pages:
+      - { path: docs/architecture.md, role: architecture, title: Architecture }
+      - { path: docs/runbook.md, role: runbook, title: Runbook }
+  # `app`, not `bot`: a domain and a component share one name space in the
+  # catalog, and a domain called `bot` would take this component's place in
+  # it — the bot missing from its own catalog.
+  domain: app
+  path: apps/bot
+  # The Worker is upstream's libraries as much as this directory: a change to
+  # any of them (packages/) is a change to what this Worker runs, so it
+  # re-plans this component. Orun selects by path, and this is the path the
+  # Worker does not own but bundles.
+  change:
+    inputs:
+      - packages/**
+  # The KV namespace's wiring document, per environment: the cloudflare-kv
+  # root lease-publishes it after its apply, and the build renders the
+  # namespace id into wrangler.jsonc from it.
+  secretEnv:
+    WIRING_CLOUDFLARE_KV_STAGE: "secret://telegram-ai-bot/telegram-ai-bot/stage/WIRING_CLOUDFLARE_KV"
+    WIRING_CLOUDFLARE_KV_PROD: "secret://telegram-ai-bot/telegram-ai-bot/prod/WIRING_CLOUDFLARE_KV"
+  # The bot's own secrets, stored per environment by its owner (README →
+  # Connecting a bot): the token from @BotFather, the admin's Telegram user id,
+  # an optional browser password for /admin and an optional webhook secret.
+  # BEST-EFFORT, wire-now-seed-later: a key nobody has stored is skipped when
+  # the job resolves its secrets (no env var, no failure), so a fresh product
+  # deploys and serves before its owner has created a bot at all. The ones
+  # that are set reach the Worker as Worker SECRETS — the composition's
+  # secrets-live step, `wrangler secret bulk`, after the deploy — and never a
+  # bundle or a log.
+  optionalSecretEnv:
+    TELEGRAM_TOKEN: "secret://telegram-ai-bot/telegram-ai-bot/{{ .environment }}/TELEGRAM_TOKEN"
+    ADMIN_ID: "secret://telegram-ai-bot/telegram-ai-bot/{{ .environment }}/ADMIN_ID"
+    ADMIN_PASSWORD: "secret://telegram-ai-bot/telegram-ai-bot/{{ .environment }}/ADMIN_PASSWORD"
+    TELEGRAM_SECRET_TOKEN: "secret://telegram-ai-bot/telegram-ai-bot/{{ .environment }}/TELEGRAM_SECRET_TOKEN"
+  subscribe:
+    environments:
+      - name: dev
+        profile: verify
+      - name: stage
+        profile: verify
+        profileRules:
+          - profile: deploy
+            when:
+              triggerRef: github-push-main
+      - name: prod
+        profile: verify
+        profileRules:
+          - profile: deploy
+            when:
+              triggerRef: github-push-main
+  parameters:
+    nodeVersion: "22"
+    pnpmVersion: "10.12.1"
+
+    workspaceDir: ../..
+    appDir: .
+
+    turboFilter: "@app/bot"
+    # The committed wrangler.jsonc is the fixture render of
+    # wrangler.template.jsonc — what the composition's structure check finds
+    # before anything is built. The build re-renders it for its environment
+    # (buildCommand), and the composition deploys and dry-runs it with
+    # `--env <environment>`: telegram-ai-bot-bot-{dev,stage,prod}.
+    wranglerConfig: wrangler.jsonc
+
+    # Pushed with `wrangler secret bulk` after each deploy, from the
+    # optionalSecretEnv values above that are stored (none, on a fresh product).
+    runtimeSecrets: "TELEGRAM_TOKEN,ADMIN_ID,ADMIN_PASSWORD,TELEGRAM_SECRET_TOKEN"
+
+    installCommand: pnpm install --frozen-lockfile
+    # Render this environment's wrangler config, then build. stage and prod
+    # render from the wiring document their cloudflare-kv apply published
+    # (secretEnv above, resolved before the job's first step); dev, which no
+    # root applies to and which only verifies, renders from the committed
+    # fixture. Then turbo builds the libraries and bundles the Worker
+    # (wrangler deploy --dry-run), and the bundle guard checks it loads in
+    # workerd. The bot's secrets never reach the build: the Worker reads them
+    # at request time.
+    buildCommand: node ../../tooling/wire/live.mjs --template wrangler.template.jsonc --out wrangler.jsonc --components cloudflare-kv --env "${ORUN_ENVIRONMENT}" --fixture wiring.fixture.json --fixture-envs dev && env -u TELEGRAM_TOKEN -u ADMIN_ID -u ADMIN_PASSWORD -u TELEGRAM_SECRET_TOKEN pnpm exec turbo run build --filter=@app/bot
+    typecheckCommand: pnpm exec turbo run typecheck --filter=@app/bot
+
+    preDeployCommand: "echo 'No pre-deploy step configured.'"
+    migrationCommand: "echo 'No migrations configured.'"
+    # THE POST-DEPLOY STEP, then the smoke. The smoke is the composition's
+    # one step after the deploy and the secrets push, so the webhook binding
+    # runs here: with a stored TELEGRAM_TOKEN, scripts/bind-webhook.mjs posts
+    # to the Worker's own POST /init/bind (the token as a bearer, never on a
+    # command line or in a log) and the Worker binds Telegram's webhook to
+    # itself, publishes the commands and the admin menu button; with none it
+    # is a named no-op. Then /health must answer `"status":"ok"` and `"kv":"ok"`
+    # for THIS environment — the reading only this Worker, bound to its KV
+    # namespace, can make. Not the bot's name, which is the owner's to change.
+    # The Worker composition exports no deployed URL, so the command names its
+    # own workers.dev URL; ${DEPLOYED_URL} overrides it (a custom domain, or a
+    # local `wrangler dev`). The body is buffered before grep so an early match
+    # cannot SIGPIPE curl. The composition retries the whole command with
+    # backoff, and both halves are idempotent.
+    smokeCommand: 'base="${DEPLOYED_URL:-https://telegram-ai-bot-bot-${ORUN_ENVIRONMENT}.your-workers-subdomain.workers.dev}" && node scripts/bind-webhook.mjs "${base}" && health="$(curl -sf --max-time 20 "${base}/health")" && echo "${health}" | grep -q "\"status\":\"ok\"" && echo "${health}" | grep -q "\"kv\":\"ok\"" && echo "${health}" | grep -q "\"environment\":\"${ORUN_ENVIRONMENT}\""'
+  labels:
+    team: platform
+    layer: runtime
+    surface: bot
+    runtime: cloudflare

@@ -1,0 +1,19 @@
+{
+    "name": "@bot/i18n",
+    "version": "0.0.0",
+    "private": true,
+    "type": "module",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "scripts": {
+        "build": "tsc -b",
+        "typecheck": "tsc -b",
+        "lint": "oxlint src"
+    },
+    "devDependencies": {
+        "@app/tsconfig": "workspace:*",
+        "@types/node": "^26.5.1",
+        "typescript": "^5.8.3",
+        "oxlint": "^1.83.0"
+    }
+}

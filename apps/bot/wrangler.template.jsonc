@@ -1,0 +1,36 @@
+// The source of wrangler.jsonc, which tooling/wire renders from it: from
+// wiring.fixture.json for local work (`pnpm run wire:fixture`, committed as
+// that render), and on every Orun lane from the wiring document the
+// `cloudflare-kv` Terraform root lease-publishes (WIRING_CLOUDFLARE_KV_<ENV>)
+// — dev, which no root applies to, from the fixture (component.yaml's
+// buildCommand). Edit this file, never wrangler.jsonc.
+//
+// The cloudflare-worker-turbo composition deploys with `--env <environment>`,
+// so the render carries ONE environment section, `__ENV__` (the environment
+// it is rendered for), and wrangler names the Worker
+// telegram-ai-bot-bot-<environment> from the top-level name. The top-level
+// bindings are what a bare `wrangler dev` runs with.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "telegram-ai-bot-bot",
+  "main": "src/index.ts",
+  // Upstream's date: nodejs_compat is on by default from it.
+  "compatibility_date": "2026-08-04",
+  "observability": { "enabled": true },
+  "vars": { "ENVIRONMENT": "local" },
+  // Workers AI — the default model's binding (no key).
+  "ai": { "binding": "AI" },
+  // Upstream's KV namespace: the global configuration and every chat's state.
+  "kv_namespaces": [
+    { "binding": "DATABASE", "id": "@@wiring(cloudflare-kv/__ENV__:app_kv_id)@@" }
+  ],
+  "env": {
+    "__ENV__": {
+      "vars": { "ENVIRONMENT": "__ENV__" },
+      "ai": { "binding": "AI" },
+      "kv_namespaces": [
+        { "binding": "DATABASE", "id": "@@wiring(cloudflare-kv/__ENV__:app_kv_id)@@" }
+      ]
+    }
+  }
+}

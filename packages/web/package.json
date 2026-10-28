@@ -1,0 +1,24 @@
+{
+    "name": "@bot/web",
+    "version": "0.0.0",
+    "private": true,
+    "type": "module",
+    "main": "./dist/index.js",
+    "types": "./index.d.ts",
+    "scripts": {
+        "build": "tsc -p tsconfig.json && pnpm vite build",
+        "dev": "pnpm vite",
+        "typecheck": "tsc -p tsconfig.json",
+        "lint": "oxlint src"
+    },
+    "dependencies": {
+        "@bot/plugins": "workspace:*"
+    },
+    "devDependencies": {
+        "vite": "^8.3.0",
+        "@app/tsconfig": "workspace:*",
+        "@types/node": "^26.5.1",
+        "typescript": "^5.8.3",
+        "oxlint": "^1.83.0"
+    }
+}

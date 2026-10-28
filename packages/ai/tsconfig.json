@@ -1,0 +1,10 @@
+{
+    "extends": "../../tooling/tsconfig/lib.json",
+    "compilerOptions": {
+        "rootDir": "./src",
+        "types": ["node", "vitest/globals"],
+        "outDir": "./dist"
+    },
+    "references": [{ "path": "../types" }],
+    "include": ["src/**/*"]
+}
